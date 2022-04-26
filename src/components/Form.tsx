@@ -5,6 +5,7 @@ import TextField from '@mui/material/TextField';
 import Stack from '@mui/material/Stack';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { styled } from '@mui/material/styles';
+import { add } from '../db/db';
 
 const Image = styled('img')(() => ({
   width: 200,
@@ -64,7 +65,7 @@ function Form() {
 
   const handleOnSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    console.log(formState);
+    add(formState);
   };
 
   const { apellidos, carrera, fechaNacimiento, imagen, nombres } = formState;

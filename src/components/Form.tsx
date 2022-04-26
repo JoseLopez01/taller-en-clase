@@ -5,7 +5,6 @@ import TextField from '@mui/material/TextField';
 import Stack from '@mui/material/Stack';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { styled } from '@mui/material/styles';
-import { add, updatePerson } from '../db/db';
 
 const Image = styled('img')(() => ({
   width: 200,
@@ -21,6 +20,7 @@ export interface FormState {
 }
 
 export interface FormProps {
+  handleOnSubmit: (data: any) => void;
   person?:
     | (FormState & {
         id: string;
@@ -36,7 +36,7 @@ const initialState: FormState = {
   fechaNacimiento: '',
 };
 
-function Form({ person }: FormProps) {
+function Form({ person, handleOnSubmit }: FormProps) {
   const [formState, setFormState] = useState<FormState>({
     ...initialState,
     fechaNacimiento: new Date().toISOString(),
@@ -44,17 +44,16 @@ function Form({ person }: FormProps) {
 
   useEffect(() => {
     async function randomImageFromPicsum() {
-      const response = await fetch('https://picsum.photos/200/200');
-      const blob = await response.blob();
-      const headers = await response.headers;
-      console.log({ headers });
-      const url = URL.createObjectURL(blob);
+      const response = await fetch('https://picsum.photos/200/200', {
+        method: 'GET',
+      });
+      const id = await response.headers.get('picsum-id');
+
       setFormState((prevState) => ({
         ...prevState,
-        imagen: url,
+        imagen: `https://picsum.photos/id/${id}/200/200`,
       }));
     }
-
     randomImageFromPicsum();
   }, []);
 
@@ -78,19 +77,25 @@ function Form({ person }: FormProps) {
     }
   };
 
-  const handleOnSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleOnSubmitForm = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (person) {
-      updatePerson(person.id, formState);
-    } else {
-      add(formState);
-    }
+    handleOnSubmit(formState);
+    setFormState(initialState);
+    const response = await fetch('https://picsum.photos/200/200', {
+      method: 'GET',
+    });
+    const id = await response.headers.get('picsum-id');
+
+    setFormState((prevState) => ({
+      ...prevState,
+      imagen: `https://picsum.photos/id/${id}/200/200`,
+    }));
   };
 
   const { apellidos, carrera, fechaNacimiento, imagen, nombres } = formState;
 
   return (
-    <form onSubmit={handleOnSubmit}>
+    <form onSubmit={handleOnSubmitForm}>
       <Stack spacing={3}>
         <TextField
           label="Nombres"

@@ -11,30 +11,13 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import DeleteIcon from '@mui/icons-material/Delete';
 
-import { deletePerson, getAll } from '../db/db';
-
 export interface PersonsProps {
   handleOnSelect: (person: any) => void;
+  handleOnDelete: (id: string) => void;
+  rows: any[];
 }
 
-function Persons({ handleOnSelect }: PersonsProps) {
-  const [rows, setRows] = useState<any>([]);
-
-  useEffect(() => {
-    async function getPersons() {
-      const persons = await getAll();
-      setRows(persons);
-    }
-
-    getPersons();
-  }, []);
-
-  const handleOnDelete = async (id: string) => {
-    await deletePerson(id);
-    const persons = await getAll();
-    setRows(persons);
-  };
-
+function Persons({ handleOnSelect, rows, handleOnDelete }: PersonsProps) {
   return (
     <TableContainer component={Paper}>
       <Table sx={{ minWidth: 650 }} aria-label="simple table">

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import format from 'date-fns/format';
 
+import IconButton from '@mui/material/IconButton';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -8,7 +9,9 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import { getAll } from '../db/db';
+import DeleteIcon from '@mui/icons-material/Delete';
+
+import { deletePerson, getAll } from '../db/db';
 
 export interface PersonsProps {
   rows: any[];
@@ -26,6 +29,10 @@ function Persons() {
     getPersons();
   }, []);
 
+  const handleOnDelete = async (id: string) => {
+    await deletePerson(id);
+  };
+
   return (
     <TableContainer component={Paper}>
       <Table sx={{ minWidth: 650 }} aria-label="simple table">
@@ -35,6 +42,7 @@ function Persons() {
             <TableCell>Carrera</TableCell>
             <TableCell>Fecha de nacimiento</TableCell>
             <TableCell>Imagen</TableCell>
+            <TableCell>Eliminar</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -51,6 +59,14 @@ function Persons() {
                 {format(new Date(row.fechaNacimiento), 'MMM, dd, yy')}
               </TableCell>
               <TableCell>{row.imagen}</TableCell>
+              <TableCell>
+                <IconButton
+                  color="error"
+                  onClick={() => handleOnDelete(row.id)}
+                >
+                  <DeleteIcon />
+                </IconButton>
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>

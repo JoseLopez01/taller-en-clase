@@ -1,5 +1,6 @@
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 
+import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Stack from '@mui/material/Stack';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -7,7 +8,7 @@ import { styled } from '@mui/material/styles';
 
 const Image = styled('img')(() => ({
   width: 200,
-  height: 300,
+  height: 200,
 }));
 
 export interface FormState {
@@ -35,7 +36,7 @@ function Form() {
   useEffect(() => {
     async function randomImageFromPicsum() {
       console.log('randomImageFromPicsum');
-      const response = await fetch('https://picsum.photos/200/300');
+      const response = await fetch('https://picsum.photos/200/200');
       const blob = await response.blob();
       const url = URL.createObjectURL(blob);
       setFormState((prevState) => ({
@@ -69,7 +70,7 @@ function Form() {
   const { apellidos, carrera, fechaNacimiento, imagen, nombres } = formState;
 
   return (
-    <form>
+    <form onSubmit={handleOnSubmit}>
       <Stack spacing={3}>
         <TextField
           label="Nombres"
@@ -100,6 +101,9 @@ function Form() {
           )}
         />
         <Image src={imagen} alt="imagen" />
+        <Button type="submit" variant="contained" color="primary" size="large">
+          Guardar
+        </Button>
       </Stack>
     </form>
   );

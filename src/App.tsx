@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -16,6 +18,8 @@ const theme = createTheme({
 });
 
 function App() {
+  const [selectedPerson, setSelectedPerson] = useState(null);
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
@@ -26,10 +30,10 @@ function App() {
           </Typography>
           <Grid container sx={{ paddingTop: 2 }}>
             <Grid item xs={4} sx={{ padding: 4 }}>
-              <Form />
+              <Form person={selectedPerson} />
             </Grid>
             <Grid item xs={8} sx={{ padding: 4 }}>
-              <Persons rows={[]} />
+              <Persons handleOnSelect={setSelectedPerson} />
             </Grid>
           </Grid>
         </Container>

@@ -14,10 +14,10 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { deletePerson, getAll } from '../db/db';
 
 export interface PersonsProps {
-  rows: any[];
+  handleOnSelect: (person: any) => void;
 }
 
-function Persons() {
+function Persons({ handleOnSelect }: PersonsProps) {
   const [rows, setRows] = useState<any>([]);
 
   useEffect(() => {
@@ -31,6 +31,8 @@ function Persons() {
 
   const handleOnDelete = async (id: string) => {
     await deletePerson(id);
+    const persons = await getAll();
+    setRows(persons);
   };
 
   return (
@@ -49,7 +51,14 @@ function Persons() {
           {rows.map((row: any) => (
             <TableRow
               key={row.id}
-              sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+              sx={{
+                '&:last-child td, &:last-child th': { border: 0 },
+                '&:hover': {
+                  backgroundColor: 'rgba(255, 255, 255, 0.5)',
+                  cursor: 'pointer',
+                },
+              }}
+              onClick={() => handleOnSelect(row)}
             >
               <TableCell component="th" scope="row">
                 {row.nombres} {row.apellidos}

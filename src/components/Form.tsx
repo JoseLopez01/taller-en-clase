@@ -5,7 +5,7 @@ import TextField from '@mui/material/TextField';
 import Stack from '@mui/material/Stack';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { styled } from '@mui/material/styles';
-import { add } from '../db/db';
+import { add, updatePerson } from '../db/db';
 
 const Image = styled('img')(() => ({
   width: 200,
@@ -20,6 +20,14 @@ export interface FormState {
   imagen: string;
 }
 
+export interface FormProps {
+  person?:
+    | (FormState & {
+        id: string;
+      })
+    | null;
+}
+
 const initialState: FormState = {
   nombres: '',
   apellidos: '',
@@ -28,7 +36,7 @@ const initialState: FormState = {
   fechaNacimiento: '',
 };
 
-function Form() {
+function Form({ person }: FormProps) {
   const [formState, setFormState] = useState<FormState>({
     ...initialState,
     fechaNacimiento: new Date().toISOString(),
@@ -36,9 +44,10 @@ function Form() {
 
   useEffect(() => {
     async function randomImageFromPicsum() {
-      console.log('randomImageFromPicsum');
       const response = await fetch('https://picsum.photos/200/200');
       const blob = await response.blob();
+      const headers = await response.headers;
+      console.log({ headers });
       const url = URL.createObjectURL(blob);
       setFormState((prevState) => ({
         ...prevState,
@@ -48,6 +57,12 @@ function Form() {
 
     randomImageFromPicsum();
   }, []);
+
+  useEffect(() => {
+    if (person) {
+      setFormState(person);
+    }
+  }, [person]);
 
   const handleOnChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
@@ -65,7 +80,11 @@ function Form() {
 
   const handleOnSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    add(formState);
+    if (person) {
+      updatePerson(person.id, formState);
+    } else {
+      add(formState);
+    }
   };
 
   const { apellidos, carrera, fechaNacimiento, imagen, nombres } = formState;

@@ -1,45 +1,76 @@
-import { useState } from 'react'
-import logo from './logo.svg'
-import './App.css'
+import { FormEvent, useEffect, useState } from 'react';
+
+import Container from '@mui/material/Container';
+import Grid from '@mui/material/Grid';
+import CssBaseline from '@mui/material/CssBaseline';
+import Typography from '@mui/material/Typography';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+
+import Form from './components/Form';
+import Persons from './components/Persons';
+import { getAll, updatePerson, add, deletePerson } from './db/db';
+
+const theme = createTheme({
+  palette: {
+    mode: 'dark',
+  },
+});
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [selectedPerson, setSelectedPerson] = useState<any>(null);
+  const [persons, setPersons] = useState<any>([]);
+
+  useEffect(() => {
+    async function getPersons() {
+      const persons = await getAll();
+      setPersons(persons);
+    }
+
+    getPersons();
+  }, []);
+
+  const handleOnSubmit = async (data: any) => {
+    if (selectedPerson) {
+      await updatePerson(selectedPerson.id, data);
+    } else {
+      await add(data);
+    }
+    const persons = await getAll();
+    setPersons(persons);
+  };
+
+  const handleOnDelete = async (id: string) => {
+    await deletePerson(id);
+    const persons = await getAll();
+    setPersons(persons);
+  };
 
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>Hello Vite + React!</p>
-        <p>
-          <button type="button" onClick={() => setCount((count) => count + 1)}>
-            count is: {count}
-          </button>
-        </p>
-        <p>
-          Edit <code>App.tsx</code> and save to test HMR updates.
-        </p>
-        <p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-          {' | '}
-          <a
-            className="App-link"
-            href="https://vitejs.dev/guide/features.html"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Vite Docs
-          </a>
-        </p>
-      </header>
-    </div>
-  )
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <LocalizationProvider dateAdapter={AdapterDateFns}>
+        <Container sx={{ paddingTop: 2 }} maxWidth={false}>
+          <Typography variant="h4" align="center">
+            Taller Buenas Practicas
+          </Typography>
+          <Grid container sx={{ paddingTop: 2 }}>
+            <Grid item xs={4} sx={{ padding: 4 }}>
+              <Form person={selectedPerson} handleOnSubmit={handleOnSubmit} />
+            </Grid>
+            <Grid item xs={8} sx={{ padding: 4 }}>
+              <Persons
+                handleOnSelect={setSelectedPerson}
+                handleOnDelete={handleOnDelete}
+                rows={persons}
+              />
+            </Grid>
+          </Grid>
+        </Container>
+      </LocalizationProvider>
+    </ThemeProvider>
+  );
 }
 
-export default App
+export default App;
